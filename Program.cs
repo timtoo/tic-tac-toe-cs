@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace TicTacToe
 {
-
+	public struct RowResult {
+		public float rank;
+		public int index;
+		public int suggestion;
+	}
 
 	class TicTacToe
 
@@ -52,7 +57,8 @@ namespace TicTacToe
 			constructor_defaults();
 
 			string pm = new string(player_mark);
-			System.Text.RegularExpressions.Regex re = new System.Text.RegularExpressions.Regex("[^" + pm + "]+");
+			// match digits or characgers in the player_mark array
+			System.Text.RegularExpressions.Regex re = new System.Text.RegularExpressions.Regex("[^0123456789" + pm + "]+");
 
 			s = s.Trim();
 
@@ -101,7 +107,7 @@ namespace TicTacToe
 		// Build ASCII representation of game
 		public override string ToString() {
 			//return "" + player_mark[board[0]];
-			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			StringBuilder sb = new StringBuilder();
 			int w = 0;
 			int h = 0;
 			for (int i=0; i<board.Length; i++) {
@@ -243,6 +249,28 @@ namespace TicTacToe
 			return row;
 		}
 
+		internal int analyze_row(int player, int[] row) {
+			/* 
+			 * 
+			 * Find win condition (complete sequence) 100% score
+			 * Find sequences with no blocking pieces (higher score for less blanks)
+			 * 
+			 * 
+			 * 
+			 * score is precent of sequence 
+			 * 
+			 * return 
+			 */
+			int player_count = 0;
+			int player_seq_count = 0;
+			int other_count = 0;
+			int other_seq_count = 0;
+			int none_count = 0;
+			return -1;
+
+
+		}
+
 		public static void Main (string[] args)
 		{
 			TicTacToe t2 = new TicTacToe(
@@ -265,13 +293,87 @@ namespace TicTacToe
 
 		}
 
-
 	}
 
+	class RowAnalysis {
+
+		// { score, sequence start, suggested empty cell }
+		private List<RowResult> sequences = new List<RowResult>();
+		private int player;
+		private int[] row;
+		private int seqlen;
+
+		// player number, row array, length of win sequence
+		public RowAnalysis(int player, int[] row, int seqlen) {
+			this.player = player;
+			this.row = row;
+			this.seqlen = seqlen;
+		}
+
+		private static int order(RowResult x, RowResult y) {
+			// reverse sort based on rank
+			if (y.rank > x.rank) return -1;
+			if (x.rank < y.rank) return 1;
+			return 0;
+		}
+
+		internal void analyse() {
+			RowResult rr;
+			int len = row.Length - seqlen + 1;
+
+			Console.WriteLine("ll:" + len);
+
+			if (len >= 1) {
+				for (int b = 0; b < len; b++) {
+					int seq_player_count = 0;
+					int seq_other_count = 0;
+					int seq_last_empty = -1;
+					for (int i=0; i < seqlen; i++) {
+						if (row[b+i] == player) {
+							seq_player_count++;
+						}
+						else if (row[b+i] == 0) {
+							seq_last_empty = b + i;
+						}
+						else {
+							seq_other_count++;
+						}
+					}
+
+					rr = new RowResult();
+					rr.index = b;
+					rr.suggestion = seq_last_empty;
+					rr.rank = 0;
+					if (seq_other_count > 0) { // there is a blocker so all is useless in this row?
+						rr.rank = 0;
+					}
+					else if (seq_player_count == seqlen - 1) { // player will win
+						rr.rank = 1;
+					}
+					else if (seq_player_count > 0) { // percentage of player pieces in sequence
+						rr.rank = seq_player_count / seqlen;
+					}
+					sequences.Add(rr);
+				}
+			}
+
+		}
+
+		public RowResult best_suggestion() {
+			sequences.Sort(order);				
+			return sequences[0];
+		}
+
+		public override string ToString() {
+			StringBuilder sb = new StringBuilder();
+//			sequences.Sort((RowResult x, RowResult y) => x.rank > y.rank ? -1 : (x.rank < y.rank ? 1 : 0));	
+			foreach (RowResult r in sequences) {
+				sb.Append(string.Format("{0} {1} {1}\n", r.rank, r.index, r.suggestion));
+			}
+			return sb.ToString();
+		}
+	}
 
 
 }
 
-// XOX
-// OXO
-// XXO
