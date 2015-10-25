@@ -250,25 +250,6 @@ namespace TicTacToe
 
 	}
 
-	[TestFixture]
-	public class RowAnalysisTest
-	{
 
-		[Test]
-		public void TestAnalysis() {
-			int[] row = { 1, 1, 0 };
-			RowAnalysis r = new RowAnalysis(1, row, 3);
-			r.analyse();
-			Console.WriteLine(r.ToString());
-
-			r = new RowAnalysis(2, row, 3);
-			r.analyse();
-			Console.WriteLine(r.ToString());
-
-			
-		}
-
-	
-	}
 
 }
