@@ -11,6 +11,9 @@ namespace TicTacToe
 		public int suggestion;
 	}
 
+	/// <summary>
+	/// Row analysis. Analyses a tic-tac-toe like board row (array)
+	/// </summary>
 	class RowAnalysis {
 		/* 
 			 * 
@@ -31,7 +34,13 @@ namespace TicTacToe
 		private int[] row;
 		private int seqlen;
 
-		// player number, row array, length of win sequence
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TicTacToe.RowAnalysis"/> class. 
+		/// player number, row array, length of win sequence
+		/// </summary>
+		/// <param name="player">Player number to analyze for.</param>
+		/// <param name="row">Row. Array of integers representing row on board.</param>
+		/// <param name="seqlen">Length of sequence required to win</param>
 		public RowAnalysis(int player, int[] row, int seqlen) {
 			this.player = player;
 			this.row = row;
@@ -39,14 +48,17 @@ namespace TicTacToe
 			this.result = new List<RowResult>();
 		}
 
-		private static int order(RowResult x, RowResult y) {
+		public static int order(RowResult x, RowResult y) {
 			// reverse sort based on rank
 			if (y.rank > x.rank) return -1;
 			if (x.rank < y.rank) return 1;
 			return 0;
 		}
 
-		internal void analyse() {
+		/// <summary>
+		/// Analyse this instance. Return list of results (which are also stored in the object).
+		/// </summary>
+		internal List<RowResult> analyse() {
 			RowResult rr;
 			int len = row.Length - seqlen + 1;
 
@@ -89,7 +101,10 @@ namespace TicTacToe
 					}
 					result.Add(rr);
 				}
+			
 			}
+
+			return result;
 
 		}
 

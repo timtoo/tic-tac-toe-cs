@@ -7,13 +7,15 @@ namespace TicTacToe
 		public Game()
 		{
 		}
+
+		public static void Main (string[] args)
+		{
+			Console.WriteLine("game...");
+
+		}
+
 	}
 
-	public static void Main (string[] args)
-	{
-
-
-	}
 
 }
 

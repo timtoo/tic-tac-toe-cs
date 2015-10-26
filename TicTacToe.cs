@@ -14,6 +14,7 @@ namespace TicTacToe
 		private int[] board;
 		public int width { get; private set; }
 		public int height { get; private set; }
+		//public int height { get; private set; }
 
 		public int player_count { get; private set; }
 		public int player_turn { get; private set; }
@@ -161,6 +162,77 @@ namespace TicTacToe
 			}
 		}
 
+		// semi-intelligent.. will win, will block
+		public void place_with_analyse() {
+			int[] row = { 1, 1, 0 };
+			RowAnalysis r = new RowAnalysis(1, row, 3);
+			r.analyse();
+			Console.WriteLine(r.ToString());
+
+		}
+
+		internal void analyse_board(int player) {
+			List<RowResult> results = new List<RowResult>();
+			RowAnalysis r;
+
+			// check all horizontal rows & diagonals where appropriate
+			for (int i=0; i < height; i++) {
+				r = new RowAnalysis(player, extract_row(i*width), win_length);
+				results.AddRange(r.analyse());
+
+				if (i <= height - win_length) {
+					r = new RowAnalysis(player, extract_diagonal_down(i*width), win_length);
+					results.AddRange(r.analyse());
+				}
+
+				if (i >= win_length-1) {
+					r = new RowAnalysis(player, extract_diagonal_up(i*width), win_length);
+					results.AddRange(r.analyse());
+				}
+			}
+
+			// check vertical rows & diagonal where appropriate
+			for (int i=0; i < width; i++) {
+				r = new RowAnalysis(player, extract_column(i), win_length);
+				results.AddRange(r.analyse());
+
+				if (i>0 && i <= width - win_length) {
+					r = new RowAnalysis(player, extract_diagonal_down(i), win_length);
+					results.AddRange(r.analyse());
+
+					r = new RowAnalysis(player, extract_diagonal_up(i * width + 1), win_length);
+					results.AddRange(r.analyse());
+				}
+
+			}
+
+			// check vertical down
+			results.Sort(RowAnalysis.order);
+
+			float best_rank = results[0].rank;
+			int same_rank_count = 1;
+
+			// check for equal ranks, and if so, random pick one
+			for (int i = 1; i < results.Length; i++) {
+				if 
+				
+			}
+				
+		}
+
+
+		/// <summary>
+		/// Iterable to extracts all line sequences (horizontal, vertical and two diagonals) for given position.
+		/// </summary>
+		/// <returns>Each row.</returns>
+		/// <param name="index">The index of the board position to extract all lines for.</param>
+		internal IEnumerable<int[]> extract_all(int index) {
+			yield return extract_row(index);
+			yield return extract_column(index);
+			yield return extract_diagonal_down(index);
+			yield return extract_diagonal_up(index);
+		}
+
 		// return array of entire row which contains position
 		internal int[] extract_row(int index) {
 			int[] row = new int[width];
@@ -254,7 +326,7 @@ namespace TicTacToe
 
 		}
 
-		public static void Main (string[] args)
+		public static void Mainx (string[] args)
 		{
 			int[] row = { 1, 1, 0 };
 			RowAnalysis r = new RowAnalysis(1, row, 3);
