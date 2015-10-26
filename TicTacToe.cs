@@ -165,57 +165,51 @@ namespace TicTacToe
 		// semi-intelligent.. will win, will block
 		public void place_with_analyse() {
 			int[] row = { 1, 1, 0 };
-			RowAnalysis r = new RowAnalysis(1, row, 3);
-			r.analyse();
+			RowAnalysis r = new RowAnalysis(1, 3);
+			r.analyse(row);
 			Console.WriteLine(r.ToString());
 
 		}
 
 		internal void analyse_board(int player) {
-			List<RowResult> results = new List<RowResult>();
-			RowAnalysis r;
+			RowAnalysis r = new RowAnalysis(player, win_length);
 
 			// check all horizontal rows & diagonals where appropriate
 			for (int i=0; i < height; i++) {
-				r = new RowAnalysis(player, extract_row(i*width), win_length);
-				results.AddRange(r.analyse());
+				r.analyse(extract_row(i*width));
 
 				if (i <= height - win_length) {
-					r = new RowAnalysis(player, extract_diagonal_down(i*width), win_length);
-					results.AddRange(r.analyse());
+					r.analyse(extract_diagonal_down(i*width));
 				}
 
 				if (i >= win_length-1) {
-					r = new RowAnalysis(player, extract_diagonal_up(i*width), win_length);
-					results.AddRange(r.analyse());
+					r.analyse(extract_diagonal_up(i*width));
 				}
 			}
 
 			// check vertical rows & diagonal where appropriate
 			for (int i=0; i < width; i++) {
-				r = new RowAnalysis(player, extract_column(i), win_length);
-				results.AddRange(r.analyse());
+				r.analyse(extract_column(i));
 
 				if (i>0 && i <= width - win_length) {
-					r = new RowAnalysis(player, extract_diagonal_down(i), win_length);
-					results.AddRange(r.analyse());
-
-					r = new RowAnalysis(player, extract_diagonal_up(i * width + 1), win_length);
-					results.AddRange(r.analyse());
+					r.analyse(extract_diagonal_down(i));
+					r.analyse(extract_diagonal_up(i * width + 1));
 				}
 
 			}
 
 			// check vertical down
-			results.Sort(RowAnalysis.order);
+			r.Sort();
 
-			float best_rank = results[0].rank;
+			float best_rank = r.result[0].rank;
 			int same_rank_count = 1;
 
 			// check for equal ranks, and if so, random pick one
-			for (int i = 1; i < results.Length; i++) {
-				if 
-				
+			for (int i = 1; i < r.result.Capacity; i++) {
+				if(r.result[i].rank == best_rank) {
+					same_rank_count++;
+				} else
+					break;				
 			}
 				
 		}
@@ -329,8 +323,8 @@ namespace TicTacToe
 		public static void Mainx (string[] args)
 		{
 			int[] row = { 1, 1, 0 };
-			RowAnalysis r = new RowAnalysis(1, row, 3);
-			r.analyse();
+			RowAnalysis r = new RowAnalysis(1, 3);
+			r.analyse(row);
 			Console.WriteLine(r.ToString());
 		}
 

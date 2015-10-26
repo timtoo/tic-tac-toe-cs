@@ -4,11 +4,13 @@ using System.Text;
 
 namespace TicTacToe
 {
-
+	/// <summary>
+	/// Row result struct. Holds result of a row analysis.
+	/// </summary>
 	public struct RowResult {
-		public float rank;
-		public int index;
-		public int suggestion;
+		public float rank; // 0 to 1
+		public int index;  // position on board
+		public int suggestion; // suggested empty board space to take
 	}
 
 	/// <summary>
@@ -31,8 +33,10 @@ namespace TicTacToe
 		// { score, sequence start, suggested empty cell }
 		public List<RowResult> result {get;}
 		private int player;
-		private int[] row;
+		private int row_analysed_count = 0;
+		//private int[] row;
 		private int seqlen;
+		private bool sorted = true;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TicTacToe.RowAnalysis"/> class. 
@@ -41,9 +45,8 @@ namespace TicTacToe
 		/// <param name="player">Player number to analyze for.</param>
 		/// <param name="row">Row. Array of integers representing row on board.</param>
 		/// <param name="seqlen">Length of sequence required to win</param>
-		public RowAnalysis(int player, int[] row, int seqlen) {
+		public RowAnalysis(int player, int seqlen) {
 			this.player = player;
-			this.row = row;
 			this.seqlen = seqlen;
 			this.result = new List<RowResult>();
 		}
@@ -56,50 +59,64 @@ namespace TicTacToe
 		}
 
 		/// <summary>
+		/// Sort this instance, highest rank first. Returns the RowResult list.
+		/// </summary>
+		public List<RowResult> Sort() {
+			if(sorted == false) {
+				result.Sort(order);
+				sorted = true;
+			}
+			return result;
+		}
+
+		/// <summary>
 		/// Analyse this instance. Return list of results (which are also stored in the object).
 		/// </summary>
-		internal List<RowResult> analyse() {
-			RowResult rr;
-			int len = row.Length - seqlen + 1;
+		public List<RowResult> analyse(int[] row) {
+			RowResult row_result;
+			int sequences_possible = row.Length - seqlen + 1;
 
-			Console.WriteLine("ll:" + len);
+			sorted = false;
+			row_analysed_count++;
 
-			if (len >= 1) {
-				for (int b = 0; b < len; b++) {
+			Console.WriteLine("sp:" + sequences_possible);
+
+			if (sequences_possible >= 1) {
+				for (int first_cell = 0; first_cell < sequences_possible; first_cell++) {
 					int seq_player_count = 0;
 					int seq_other_count = 0;
 					int seq_last_empty = -1;
 					for (int i=0; i < seqlen; i++) {
-						if (row[b+i] == player) {
+						if (row[first_cell+i] == player) {
 							seq_player_count++;
 						}
-						else if (row[b+i] == 0) {
-							seq_last_empty = b + i;
+						else if (row[first_cell+i] == 0) {
+							seq_last_empty = first_cell + i;
 						}
 						else {
 							seq_other_count++;
 						}
 					}
 
-					rr = new RowResult();
-					rr.index = b;
-					rr.suggestion = seq_last_empty;
-					rr.rank = 0;
+					row_result = new RowResult();
+					row_result.index = first_cell;
+					row_result.suggestion = seq_last_empty;
+					row_result.rank = 0;
 
 					if (seq_other_count == seqlen - 1) { // blocking is required or other wins
-						rr.suggestion = seq_last_empty;
-						rr.rank = 0.999f;					
+						row_result.suggestion = seq_last_empty;
+						row_result.rank = 0.999f;					
 					}
 					else if (seq_other_count > 0) { // there is a blocker so all is useless in this row?
-						rr.rank = 0;
+						row_result.rank = 0;
 					}
 					else if (seq_player_count == seqlen - 1) { // player will win
-						rr.rank = 1;
+						row_result.rank = 1;
 					}
 					else if (seq_player_count > 0) { // percentage of player pieces in sequence
-						rr.rank = seq_player_count / seqlen;
+						row_result.rank = seq_player_count / seqlen;
 					}
-					result.Add(rr);
+					result.Add(row_result);
 				}
 			
 			}
@@ -109,14 +126,12 @@ namespace TicTacToe
 		}
 
 		public RowResult best_suggestion() {
-			result.Sort(order);				
-			return result[0];
+			return Sort()[0];
 		}
 
 		public override string ToString() {
-			result.Sort(order);
 			StringBuilder sb = new StringBuilder();
-			foreach (RowResult r in result) {
+			foreach (RowResult r in Sort()) {
 				sb.Append(string.Format("<RowResult: rank={0} index={1} move={2}>{3}", r.rank, r.index, r.suggestion, Environment.NewLine));
 			}
 			return sb.ToString();
