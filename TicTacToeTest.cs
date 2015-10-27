@@ -27,8 +27,10 @@ namespace TicTacToe
 			TicTacToe t = new TicTacToe();
 
 			string s = t.ToString();
-			Assert.AreEqual("...\n...\n...", s);
-			Assert.AreEqual(1, t.player_turn);
+			Assert.That("...\n...\n...", Is.EqualTo(s));
+			Assert.That(1, Is.EqualTo(t.player_turn));
+			Assert.That(3, Is.EqualTo(t.width));
+			Assert.That(3, Is.EqualTo(t.height));
 
 			// test x,y place
 			t.place(2,0); 
@@ -43,8 +45,9 @@ namespace TicTacToe
 			// test x,y place
 			t.place(8); 
 			Assert.AreEqual("..X\nO..\n..X", t.ToString());
-			Assert.AreEqual(2, t.player_turn);
-
+			Assert.That(2, Is.EqualTo(t.player_turn));
+			Assert.That(3, Is.EqualTo(t.width));
+			Assert.That(3, Is.EqualTo(t.height));
 		}
 
 		[Test]
@@ -58,7 +61,7 @@ namespace TicTacToe
 			Assert.AreEqual(1, t.player_turn);
 
 
-			t = new TicTacToe("..X.O.X..");
+			t = new TicTacToe("..X.O.X..\n");
 			Assert.AreEqual("..X\n.O.\nX..", t.ToString());
 			Assert.AreEqual(3, t.width);
 			Assert.AreEqual(3, t.height);
@@ -246,6 +249,38 @@ namespace TicTacToe
 
 			int[] t3r3 = { 1, 1 };
 			CollectionAssert.AreEqual(t3r3, t3.extract_diagonal_up(16)); // 5, 2
+		}
+
+		[Test]
+		public void BoardAnalyse() {
+			Console.WriteLine("xxxxxxxxxxxxxxx");
+
+			TicTacToe t = new TicTacToe(
+				"X.X\n" +
+				"O.O\n" +
+				"X.O\n");
+
+			RowAnalysis r = t.analyse_board(1);
+
+			Assert.That(r.result.Capacity, Is.EqualTo(8));
+
+			Assert.That(r.result[0].rank, Is.EqualTo(1));
+			Assert.That(r.result[0].rank, Is.EqualTo(1));
+
+
+
+			Assert.That(r.result[1].rank, Is.EqualTo(1));
+			Assert.That(r.result[2].rank, Is.EqualTo(0.999f));
+			Assert.That(r.result[7].rank, Is.EqualTo(0));
+
+			Assert.That(r.result[0].rank, Is.EqualTo(1));
+			Assert.That(r.result[1].rank, Is.EqualTo(1));
+			Assert.That(r.result[2].rank, Is.EqualTo(0.999f));
+			Assert.That(r.result[7].rank, Is.EqualTo(0));
+
+			Console.WriteLine(r.ToString());
+
+
 		}
 
 	}

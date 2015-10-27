@@ -4,8 +4,14 @@ using System.Text;
 
 namespace TicTacToe
 {
-	class TicTacToe
+	public struct Direction {
+		public static int horizontal = 0;
+		public static int vertical = 90;
+		public static int diagonal_up = 215;
+		public static int diagonal_down = 45;
+	}
 
+	class TicTacToe
 	{
 		public static char[] player_mark = {'.', 'X', 'O'};
 
@@ -166,34 +172,40 @@ namespace TicTacToe
 		public void place_with_analyse() {
 			int[] row = { 1, 1, 0 };
 			RowAnalysis r = new RowAnalysis(1, 3);
-			r.analyse(row);
+			//r.analyse(row);
 			Console.WriteLine(r.ToString());
 
 		}
 
-		internal void analyse_board(int player) {
+		internal RowAnalysis analyse_board(int player) {
 			RowAnalysis r = new RowAnalysis(player, win_length);
+			Console.WriteLine("height: {0} width: {1}", height, width);
 
 			// check all horizontal rows & diagonals where appropriate
 			for (int i=0; i < height; i++) {
-				r.analyse(extract_row(i*width));
+				r.analyse(extract_row(i*width), i * width, Direction.horizontal);
+				Console.WriteLine("R" + i.ToString());
 
 				if (i <= height - win_length) {
-					r.analyse(extract_diagonal_down(i*width));
+					Console.WriteLine("DD:");
+					r.analyse(extract_diagonal_down(i*width), i*width, Direction.diagonal_down);
 				}
 
 				if (i >= win_length-1) {
-					r.analyse(extract_diagonal_up(i*width));
+					Console.WriteLine("DU:");
+					r.analyse(extract_diagonal_up(i*width), i*width, Direction.diagonal_up);
 				}
 			}
 
 			// check vertical rows & diagonal where appropriate
 			for (int i=0; i < width; i++) {
-				r.analyse(extract_column(i));
+				r.analyse(extract_column(i), i, Direction.vertical);
+				Console.WriteLine("C" + i.ToString());
 
 				if (i>0 && i <= width - win_length) {
-					r.analyse(extract_diagonal_down(i));
-					r.analyse(extract_diagonal_up(i * width + 1));
+					Console.WriteLine("DB:");
+					r.analyse(extract_diagonal_down(i), i, Direction.diagonal_down);
+					r.analyse(extract_diagonal_up((height-1) * width + i), (height-1) * width + i, Direction.diagonal_up);
 				}
 
 			}
@@ -211,6 +223,8 @@ namespace TicTacToe
 				} else
 					break;				
 			}
+
+			return r;
 				
 		}
 
@@ -220,7 +234,7 @@ namespace TicTacToe
 		/// </summary>
 		/// <returns>Each row.</returns>
 		/// <param name="index">The index of the board position to extract all lines for.</param>
-		internal IEnumerable<int[]> extract_all(int index) {
+		internal IEnumerable<int[]> interate_lines(int index) {
 			yield return extract_row(index);
 			yield return extract_column(index);
 			yield return extract_diagonal_down(index);
@@ -308,23 +322,12 @@ namespace TicTacToe
 
 			return row;
 		}
-
-		internal int analyze_row(int player, int[] row) {
-			int player_count = 0;
-			int player_seq_count = 0;
-			int other_count = 0;
-			int other_seq_count = 0;
-			int none_count = 0;
-			return -1;
-
-
-		}
-
+			
 		public static void Mainx (string[] args)
 		{
 			int[] row = { 1, 1, 0 };
 			RowAnalysis r = new RowAnalysis(1, 3);
-			r.analyse(row);
+			//r.analyse(row);
 			Console.WriteLine(r.ToString());
 		}
 

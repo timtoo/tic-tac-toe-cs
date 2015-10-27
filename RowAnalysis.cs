@@ -7,10 +7,12 @@ namespace TicTacToe
 	/// <summary>
 	/// Row result struct. Holds result of a row analysis.
 	/// </summary>
-	public struct RowResult {
+	public struct LineResult {
 		public float rank; // 0 to 1
-		public int index;  // position on board
-		public int suggestion; // suggested empty board space to take
+		public int index;  // position of sequence in line
+		public int suggestion; // suggested empty space in line to take
+		public int position; // position on board of first cell in line
+		public int direction; // direction of line (0 = horizontal, 90 = vertical, 45 = diag. down, 215 = diag. up)
 	}
 
 	/// <summary>
@@ -31,7 +33,7 @@ namespace TicTacToe
 			 */
 
 		// { score, sequence start, suggested empty cell }
-		public List<RowResult> result {get;}
+		public List<LineResult> result {get;}
 		private int player;
 		private int row_analysed_count = 0;
 		//private int[] row;
@@ -48,20 +50,20 @@ namespace TicTacToe
 		public RowAnalysis(int player, int seqlen) {
 			this.player = player;
 			this.seqlen = seqlen;
-			this.result = new List<RowResult>();
+			this.result = new List<LineResult>();
 		}
 
-		public static int order(RowResult x, RowResult y) {
+		public static int order(LineResult x, LineResult y) {
 			// reverse sort based on rank
-			if (y.rank > x.rank) return -1;
-			if (x.rank < y.rank) return 1;
+			if (y.rank < x.rank) return -1;
+			if (x.rank > y.rank) return 1;
 			return 0;
 		}
 
 		/// <summary>
 		/// Sort this instance, highest rank first. Returns the RowResult list.
 		/// </summary>
-		public List<RowResult> Sort() {
+		public List<LineResult> Sort() {
 			if(sorted == false) {
 				result.Sort(order);
 				sorted = true;
@@ -72,20 +74,24 @@ namespace TicTacToe
 		/// <summary>
 		/// Analyse this instance. Return list of results (which are also stored in the object).
 		/// </summary>
-		public List<RowResult> analyse(int[] row) {
-			RowResult row_result;
+		public List<LineResult> analyse(int[] row, int position, int direction) {
+			LineResult row_result;
 			int sequences_possible = row.Length - seqlen + 1;
 
 			sorted = false;
 			row_analysed_count++;
 
-			Console.WriteLine("sp:" + sequences_possible);
+			Console.WriteLine("sequences possible:" + sequences_possible);
 
 			if (sequences_possible >= 1) {
+
+				// loop over "first_cell" of each sequence possible in row.
 				for (int first_cell = 0; first_cell < sequences_possible; first_cell++) {
 					int seq_player_count = 0;
 					int seq_other_count = 0;
 					int seq_last_empty = -1;
+
+					// loop over sequence and count cells owned by players & note empties
 					for (int i=0; i < seqlen; i++) {
 						if (row[first_cell+i] == player) {
 							seq_player_count++;
@@ -98,10 +104,13 @@ namespace TicTacToe
 						}
 					}
 
-					row_result = new RowResult();
+					// create and populate RowResult object based on analysis of sequence
+					row_result = new LineResult();
 					row_result.index = first_cell;
 					row_result.suggestion = seq_last_empty;
 					row_result.rank = 0;
+					row_result.position = position;
+					row_result.direction = direction;
 
 					if (seq_other_count == seqlen - 1) { // blocking is required or other wins
 						row_result.suggestion = seq_last_empty;
@@ -125,14 +134,15 @@ namespace TicTacToe
 
 		}
 
-		public RowResult best_suggestion() {
+		public LineResult best_suggestion() {
 			return Sort()[0];
 		}
 
 		public override string ToString() {
 			StringBuilder sb = new StringBuilder();
-			foreach (RowResult r in Sort()) {
-				sb.Append(string.Format("<RowResult: rank={0} index={1} move={2}>{3}", r.rank, r.index, r.suggestion, Environment.NewLine));
+			foreach (LineResult r in Sort()) {
+				sb.Append(string.Format("<RowResult: rank={0} index={1} move={2} dir={3} pos={4}>{5}", 
+						r.rank, r.index, r.suggestion, r.direction, r.position, Environment.NewLine));
 			}
 			return sb.ToString();
 		}
