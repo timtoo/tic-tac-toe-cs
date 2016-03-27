@@ -30,6 +30,11 @@ namespace TicTacToe
 
 		// -----------------------------------------------------------------------------------------
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TicTacToe.TicTacToe"/> class (tic-tac-toe like board).
+		/// </summary>
+		/// <param name="width">Width.</param>
+		/// <param name="height">Height.</param>
 		public TicTacToe(int width, int height) {
 			constructor_defaults();
 
@@ -44,10 +49,16 @@ namespace TicTacToe
 
 		}
 
-		// shortcut constructor for standard tictactoe
+		/// <summary>
+		/// Shortcut to initialize a 3x3 new instance of the <see cref="TicTacToe.TicTacToe"/> class.
+		/// </summary>
 		public TicTacToe() : this(3, 3) {}
 
-		// create a game from a string representation
+		/// <summary>
+		/// Parse tic-tac-toe like game from string and initializes a new instance of the <see cref="TicTacToe.TicTacToe"/> class.
+		/// The string should contain lines of X and O or . for an unused cell, with newlines at the end of each row. 
+		/// </summary>
+		/// <param name="s">S. The string containing the game.</param>
 		public TicTacToe(string s) {
 			/* Parse a string representing a game board, where . represents
 			 * an empty space, and X is player 1, and O is player 2. 
@@ -93,9 +104,11 @@ namespace TicTacToe
 				throw new ArgumentException("Can not parse tic-tac-toe string");
 			}
 		}
-			
+
+		/// <summary>
+		/// Constructor defaults. Until mono supports Auto-property defaults.
+		/// </summary>
 		private void constructor_defaults() {
-			// because mono here doens't support Auto-property defaults yet
 			width = 0;
 			height = 0;
 			player_count = 2;
@@ -105,7 +118,10 @@ namespace TicTacToe
 
 		// -----------------------------------------------------------------------------------------
 
-		// Build ASCII representation of game
+		/// <summary>
+		/// Build ASCII representation of game. 
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that represents the current <see cref="TicTacToe.TicTacToe"/>.</returns>
 		public override string ToString() {
 			//return "" + player_mark[board[0]];
 			StringBuilder sb = new StringBuilder();
@@ -123,6 +139,9 @@ namespace TicTacToe
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Describe the details of this instance. Includes ToString() drawing of board. 
+		/// </summary>
 		public string Describe() {
 			System.Text.StringBuilder sb = new System.Text.StringBuilder();
 			sb.Append("Dimensions: " + width + "x" + height + "\n");
@@ -131,10 +150,17 @@ namespace TicTacToe
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Gets the history.
+		/// </summary>
+		/// <returns>The history.</returns>
 		public List<int> GetHistory() {
 			return history;
 		}
 
+		/// <summary>
+		/// Sets the player_turn to the next player.
+		/// </summary>
 		private void next_player() {
 			player_turn++;
 			if (player_turn > player_count) {
@@ -142,7 +168,11 @@ namespace TicTacToe
 			}
 		}
 			
-		// place piece on linear board (all placement should go through this method)
+		/// <summary>
+		/// Claim board location for current player (all placement, or turns, should go through this method). 
+		/// The number of turns in the game is incremented, and the player_turn moves to next player.
+		/// </summary>
+		/// <param name="index">Index. The location on the board array</param>
 		public void place(int index) {
 			board[index] = player_turn;
 			turns++;
@@ -150,12 +180,18 @@ namespace TicTacToe
 			history.Add(index);
 		}
 
-		// place piece for player given column & row (zero based)
+		/// <summary>
+		/// claim column/row position for current player (figures out index and calls place(index))
+		/// </summary>
+		/// <param name="column">Column.</param>
+		/// <param name="row">Row.</param>
 		public void place(int column, int row) {
 			place((row * width) + column);
 		}
-
-		// place next player in random available place
+			
+		/// <summary>
+		/// Take turn for current player claiming an empty cell entirely at random
+		/// </summary>
 		public void place_random() {
 			if (turns < board.Length) {
 				while (true) {
@@ -177,6 +213,11 @@ namespace TicTacToe
 
 		}
 
+		/// <summary>
+		/// Analyses the whole board. Runs unsorted list of scores for each line for each position.
+		/// </summary>
+		/// <returns>Line Analysis object with all lines analysed in the *unsorted* results property.</returns>
+		/// <param name="player">Player number. The perspective of the analysis</param>
 		internal RowAnalysis analyse_board(int player) {
 			RowAnalysis r = new RowAnalysis(player, win_length);
 			Console.WriteLine("height: {0} width: {1}", height, width);
@@ -210,8 +251,7 @@ namespace TicTacToe
 
 			}
 
-			// check vertical down
-			r.Sort();
+			//r.Sort();
 
 			float best_rank = r.result[0].rank;
 			int same_rank_count = 1;
@@ -241,7 +281,11 @@ namespace TicTacToe
 			yield return extract_diagonal_up(index);
 		}
 
-		// return array of entire row which contains position
+		/// <summary>
+		/// Extracts the horizontal line the given cell passes through.
+		/// </summary>
+		/// <returns>The row as Array</returns>
+		/// <param name="index">Index.</param>
 		internal int[] extract_row(int index) {
 			int[] row = new int[width];
 			int row_start = (index / width) * width;
@@ -251,7 +295,11 @@ namespace TicTacToe
 			return row;
 		}
 
-		// return array of entire row which contains position
+		/// <summary>
+		/// Extracts the vertical line the given cell passes through
+		/// </summary>
+		/// <returns>The column.</returns>
+		/// <param name="index">Index.</param>
 		internal int[] extract_column(int index) {
 			int[] col = new int[height];
 			int column = index % width;

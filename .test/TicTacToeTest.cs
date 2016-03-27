@@ -258,18 +258,38 @@ namespace TicTacToe
 			TicTacToe t = new TicTacToe(
 				"X.X\n" +
 				"O.O\n" +
-				"X.O\n");
+				"X..\n");
 
 			RowAnalysis r = t.analyse_board(1);
 
+			Console.WriteLine(t.ToString());
+			Console.WriteLine(r.ToString(false));
+			Console.WriteLine(r.result[0].ToString());
+
+			// 
 			Assert.That(r.result.Capacity, Is.EqualTo(8));
 
-			Assert.That(r.result[0].rank, Is.EqualTo(1));
-			Assert.That(r.result[0].rank, Is.EqualTo(1));
+			Assert.That(r.result[0].rank, Is.EqualTo(1f));
+			Assert.That(r.result[0].position, Is.EqualTo(0));
+			Assert.That(r.result[0].direction, Is.EqualTo(0));
+			Assert.That(r.result[0].index, Is.EqualTo(0));
+			Assert.That(r.result[0].suggestion, Is.EqualTo(1));
+
+			Assert.That(r.result[1].rank, Is.EqualTo(1.0f/3));
+			Assert.That(r.result[1].position, Is.EqualTo(0));
+			Assert.That(r.result[1].direction, Is.EqualTo(45));
+			Assert.That(r.result[1].index, Is.EqualTo(0));
+			Assert.That(r.result[1].suggestion, Is.EqualTo(2));
+
+			Assert.That(r.result[2].rank, Is.EqualTo(1.0f/3));
+			Assert.That(r.result[2].position, Is.EqualTo(0));
+			Assert.That(r.result[2].direction, Is.EqualTo(45));
+			Assert.That(r.result[2].index, Is.EqualTo(0));
+			Assert.That(r.result[2].suggestion, Is.EqualTo(2));
 
 
 
-			Assert.That(r.result[1].rank, Is.EqualTo(1));
+			/*Assert.That(r.result[1].rank, Is.EqualTo(1));
 			Assert.That(r.result[2].rank, Is.EqualTo(0.999f));
 			Assert.That(r.result[7].rank, Is.EqualTo(0));
 
@@ -277,8 +297,7 @@ namespace TicTacToe
 			Assert.That(r.result[1].rank, Is.EqualTo(1));
 			Assert.That(r.result[2].rank, Is.EqualTo(0.999f));
 			Assert.That(r.result[7].rank, Is.EqualTo(0));
-
-			Console.WriteLine(r.ToString());
+*/
 
 
 		}

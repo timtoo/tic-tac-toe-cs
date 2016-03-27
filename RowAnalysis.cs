@@ -13,6 +13,11 @@ namespace TicTacToe
 		public int suggestion; // suggested empty space in line to take
 		public int position; // position on board of first cell in line
 		public int direction; // direction of line (0 = horizontal, 90 = vertical, 45 = diag. down, 215 = diag. up)
+
+		public override string ToString() {
+			return string.Format("<LineResult: rank={0} pos={4} dir={3} index={1} move={2}>", 
+				rank, index, suggestion, direction, position);
+		}
 	}
 
 	/// <summary>
@@ -53,10 +58,15 @@ namespace TicTacToe
 			this.result = new List<LineResult>();
 		}
 
-		public static int order(LineResult x, LineResult y) {
+		/// <summary>
+		/// Sort function to reverse sort the LineResult list.
+		/// </summary>
+		/// <param name="a">The a LineResult.</param>
+		/// <param name="b">The y LineResult.</param>
+		public static int _Sort(LineResult a, LineResult b) {
 			// reverse sort based on rank
-			if (y.rank < x.rank) return -1;
-			if (x.rank > y.rank) return 1;
+			if (b.rank < a.rank) return -1;
+			if (a.rank > b.rank) return 1;
 			return 0;
 		}
 
@@ -65,18 +75,21 @@ namespace TicTacToe
 		/// </summary>
 		public List<LineResult> Sort() {
 			if(sorted == false) {
-				result.Sort(order);
+				result.Sort(_Sort);
 				sorted = true;
 			}
 			return result;
 		}
 
 		/// <summary>
-		/// Analyse this instance. Return list of results (which are also stored in the object).
+		/// Analyse a line array. Return list of results (which are also stored in the object).
+		/// 
+		/// Scoring:
+		/// 
 		/// </summary>
-		public List<LineResult> analyse(int[] row, int position, int direction) {
+		public RowAnalysis analyse(int[] line, int position, int direction) {
 			LineResult row_result;
-			int sequences_possible = row.Length - seqlen + 1;
+			int sequences_possible = line.Length - seqlen + 1;
 
 			sorted = false;
 			row_analysed_count++;
@@ -93,10 +106,10 @@ namespace TicTacToe
 
 					// loop over sequence and count cells owned by players & note empties
 					for (int i=0; i < seqlen; i++) {
-						if (row[first_cell+i] == player) {
+						if (line[first_cell+i] == player) {
 							seq_player_count++;
 						}
-						else if (row[first_cell+i] == 0) {
+						else if (line[first_cell+i] == 0) {
 							seq_last_empty = first_cell + i;
 						}
 						else {
@@ -112,40 +125,47 @@ namespace TicTacToe
 					row_result.position = position;
 					row_result.direction = direction;
 
-					if (seq_other_count == seqlen - 1) { // blocking is required or other wins
+
+					if (seq_last_empty == -1) { // no available spaces
+						row_result.rank = -1;
+					}
+					else if (seq_other_count == seqlen - 1) { // blocking is required or other wins
 						row_result.suggestion = seq_last_empty;
 						row_result.rank = 0.999f;					
 					}
-					else if (seq_other_count > 0) { // there is a blocker so all is useless in this row?
-						row_result.rank = 0;
+					else if (seq_other_count > 0) { // there is a blocker so this sequence is not valuable
+						row_result.rank = (float)seq_other_count / seqlen / seqlen;
 					}
 					else if (seq_player_count == seqlen - 1) { // player will win
 						row_result.rank = 1;
 					}
 					else if (seq_player_count > 0) { // percentage of player pieces in sequence
-						row_result.rank = seq_player_count / seqlen;
+						row_result.rank = (float)seq_player_count / seqlen;
 					}
 					result.Add(row_result);
-				}
-			
+				}	
 			}
-
-			return result;
-
+			return this;
 		}
 
 		public LineResult best_suggestion() {
 			return Sort()[0];
 		}
 
-		public override string ToString() {
+		public string ToString(bool sorted) {
 			StringBuilder sb = new StringBuilder();
-			foreach (LineResult r in Sort()) {
-				sb.Append(string.Format("<RowResult: rank={0} index={1} move={2} dir={3} pos={4}>{5}", 
-						r.rank, r.index, r.suggestion, r.direction, r.position, Environment.NewLine));
+			if(sorted)
+				Sort();
+			foreach (LineResult r in result) {
+				sb.Append(r.ToString() + Environment.NewLine);
 			}
 			return sb.ToString();
 		}
+
+		public override string ToString() {
+			return ToString(true);
+		}
+
 	}
 
 

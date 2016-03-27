@@ -11,6 +11,7 @@ namespace TicTacToe
 		[Test]
 		public void TestAnalysis() {
 			int[] row = { 1, 1, 0 };
+
 			RowAnalysis r = new RowAnalysis(1, 3);
 			r.analyse(row,0,0);
 			//Console.WriteLine(r.ToString());
