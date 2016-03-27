@@ -1,8 +1,9 @@
 ﻿using System;
 
 using NUnit.Framework;
+using TicTacToeLib;
 
-namespace TicTacToe
+namespace TicTacToeTest
 {
 	[TestFixture]
 	public class RowAnalysisTest

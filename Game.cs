@@ -1,6 +1,7 @@
 ﻿using System;
+using TicTacToeLib;
 
-namespace TicTacToe
+namespace TicTacToeGame
 {
 	public class Game
 	{

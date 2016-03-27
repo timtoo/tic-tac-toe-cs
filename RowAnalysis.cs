@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TicTacToe
+namespace TicTacToeLib
 {
 	/// <summary>
 	/// Row result struct. Holds result of a row analysis.

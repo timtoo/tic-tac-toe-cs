@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TicTacToe
+namespace TicTacToeLib
 {
 	public struct Direction {
 		public static int horizontal = 0;
